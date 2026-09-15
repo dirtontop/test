@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Personal Web Proxy</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: #111; color: #eee; height: 100vh; display: flex; flex-direction: column; }
+    .toolbar { display: flex; gap: 8px; padding: 10px; background: #1c1c1c; border-bottom: 1px solid #333; }
+    button { background: #2a2a2a; color: #fff; border: 1px solid #444; border-radius: 7px; padding: 8px 11px; cursor: pointer; }
+    button:hover { background: #353535; }
+    input { flex: 1; min-width: 0; background: #0d0d0d; color: #fff; border: 1px solid #444; border-radius: 7px; padding: 9px 12px; font-size: 15px; }
+    iframe { flex: 1; width: 100%; border: 0; background: #fff; }
+    .hint { padding: 5px 12px; font-size: 12px; color: #aaa; background: #171717; }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button id="back" title="Back">←</button>
+    <button id="forward" title="Forward">→</button>
+    <button id="reload" title="Reload">↻</button>
+    <input id="url" placeholder="Enter a website, e.g. https://example.com" autocomplete="off">
+    <button id="go">Go</button>
+  </div>
+  <div class="hint">Personal proxy • Some sites may still block proxying or require features this simple proxy cannot provide.</div>
+  <iframe id="frame" referrerpolicy="no-referrer"></iframe>
+
+  <script>
+    const frame = document.getElementById("frame");
+    const input = document.getElementById("url");
+    const go = document.getElementById("go");
+
+    function proxyUrl(value) {
+      let u = value.trim();
+      if (!/^https?:\\/\\//i.test(u)) u = "https://" + u;
+      return "/proxy?url=" + encodeURIComponent(u);
+    }
+
+    function navigate() {
+      const value = input.value.trim();
+      if (!value) return;
+      frame.src = proxyUrl(value);
+    }
+
+    go.addEventListener("click", navigate);
+    input.addEventListener("keydown", e => {
+      if (e.key === "Enter") navigate();
+    });
+
+    document.getElementById("reload").onclick = () => {
+      try { frame.contentWindow.location.reload(); } catch { frame.src = frame.src; }
+    };
+    document.getElementById("back").onclick = () => {
+      try { frame.contentWindow.history.back(); } catch {}
+    };
+    document.getElementById("forward").onclick = () => {
+      try { frame.contentWindow.history.forward(); } catch {}
+    };
+
+    frame.addEventListener("load", () => {
+      try {
+        input.value = frame.contentWindow.location.href;
+      } catch {}
+    });
+
+    input.value = "https://example.com";
+    navigate();
+  </script>
+</body>
+</html>
