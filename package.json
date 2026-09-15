@@ -1,0 +1,15 @@
+{
+  "name": "personal-web-proxy",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Personal browser-style web proxy with URL rewriting, redirects, cookies, and asset proxying.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "http-proxy": "^1.18.1",
+    "cookie-parser": "^1.4.7"
+  }
+}
